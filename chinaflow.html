@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>中国人流迁徙图</title>
+    <!-- 引入 echarts.js -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+</head>
+<body style="margin:0">
+    <!-- 图表容器 -->
+    <div id="main" style="width: 100vw; height: 100vh;"></div>
+
+    <script type="text/javascript">
+        var chart = echarts.init(document.getElementById('main'));
+
+        // 城市经纬度表
+        var geoCoordMap = {
+            "北京": [116.4074, 39.9042],
+            "天津": [117.2000, 39.1333],
+            "上海": [121.4737, 31.2304],
+            "重庆": [106.5505, 29.5638],
+            "河北": [114.5300, 38.0371],
+            "山西": [112.5492, 37.8570],
+            "辽宁": [123.4291, 41.7968],
+            "吉林": [125.3245, 43.8868],
+            "黑龙江": [126.6425, 45.7560],
+            "江苏": [118.7674, 32.0415],
+            "浙江": [120.1536, 30.2655],
+            "安徽": [117.2830, 31.8612],
+            "福建": [119.3062, 26.0753],
+            "江西": [115.8922, 28.6765],
+            "山东": [117.0009, 36.6758],
+            "河南": [113.6654, 34.7570],
+            "湖北": [114.2986, 30.5844],
+            "湖南": [112.9388, 28.2282],
+            "广东": [113.2644, 23.1291],
+            "广西": [108.3200, 22.8240],
+            "海南": [110.3312, 20.0319],
+            "四川": [104.0665, 30.5728],
+            "贵州": [106.7135, 26.5783],
+            "云南": [102.7123, 25.0406],
+            "陕西": [108.9542, 34.2655],
+            "甘肃": [103.8343, 36.0611],
+            "青海": [101.7782, 36.6171],
+            "西藏": [91.1322, 29.6604],
+            "内蒙古": [111.6708, 40.8183],
+            "宁夏": [106.2782, 38.4664],
+            "新疆": [87.6177, 43.7928],
+            "香港": [114.1733, 22.3200],
+            "澳门": [113.5439, 22.1987],
+            "台湾": [121.5091, 25.0443]
+        };
+
+        // 数据
+        var moveData = [
+            {"from": "北京", "to": "上海", "value": 1200},
+            {"from": "广东", "to": "四川", "value": 800}
+        ];
+
+        // 转换成 ECharts 需要的格式
+        var convertData = function (data) {
+            var res = [];
+            for (var i = 0; i < data.length; i++) {
+                var fromCoord = geoCoordMap[data[i].from];
+                var toCoord = geoCoordMap[data[i].to];
+                if (fromCoord && toCoord) {
+                    res.push({
+                        fromName: data[i].from,
+                        toName: data[i].to,
+                        coords: [fromCoord, toCoord],
+                        value: data[i].value
+                    });
+                }
+            }
+            return res;
+        };
+
+        var option = {
+            backgroundColor: '#FFFFFF',
+            tooltip: {
+                trigger: 'item',
+                formatter: function (params) {
+                    if (params.seriesType === "lines") {
+                        return params.data.fromName + " → " + params.data.toName + " : " + params.data.value;
+                    } else {
+                        return params.name;
+                    }
+                }
+            },
+            geo: {
+                map: 'china',
+                roam: true, // 可以拖动缩放
+                label: {
+                    emphasis: {
+                        show: false
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        areaColor: '#C8E6E0',
+                        borderColor: '#111'
+                    },
+                    emphasis: {
+                        areaColor: '#A5D0DD'
+                    }
+                }
+            },
+            series: [
+            {
+                name: '人流量',
+                type: 'lines',
+                coordinateSystem: 'geo',
+                zlevel: 2,
+                effect: {
+                show: true,
+                period: 4,
+                trailLength: 0.2,
+                symbol: 'arrow',
+                symbolSize: 10
+                },
+                lineStyle: {
+                color: function (params) {
+                    var v = params.data.value;
+                    if (v > 1000) {
+                    return '#d73027'; // 深红
+                    } else if (v > 500) {
+                    return '#fc8d59'; // 橙色
+                    } else {
+                    return '#fee090'; // 浅黄
+                    }
+                },
+                width: 2,
+                opacity: 0.8,
+                curveness: 0.2
+                },
+                data: convertData(moveData)
+            }
+            ]
+        };
+
+        chart.setOption(option);
+    </script>
+</body>
+</html>
