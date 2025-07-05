@@ -61,7 +61,9 @@
                         fromName: data[i].from,
                         toName: data[i].to,
                         coords: [fromCoord, toCoord],
-                        value: data[i].value
+                        value: data[i].value,
+                        // 添加格式化后的值用于标签显示
+                        b: data[i].formattedValue || data[i].value.toString()
                     });
                 }
             }
@@ -136,6 +138,15 @@
                         symbol: 'arrow',
                         symbolSize: 10
                     },
+                    // 新增的标签配置
+                    label: {
+                        show: true,
+                        position: 'middle',
+                        formatter: '{b}',  // 使用数据中的b属性
+                        backgroundColor: 'rgba(255,255,255,0.7)',
+                        borderColor: '#999',
+                        borderWidth: 1
+                    },
                     lineStyle: {
                         color: '#d73027',
                         width: 2,
@@ -155,6 +166,13 @@
             var to = document.getElementById("toSelect").value;
             var filteredData = moveData.filter(function(item) {
                 return item.from === from && item.to === to;
+            }).map(function(item) {
+                // 格式化数值：大于1万显示为"x.x万"
+                var formattedValue = item.value >= 10000 ? 
+                    (item.value/10000).toFixed(1) + '万' : 
+                    item.value;
+                item.formattedValue = formattedValue;
+                return item;
             });
             option.series[0].data = convertData(filteredData);
             chart.setOption(option);
