@@ -39,6 +39,13 @@ var geoCoordMap = {
 
 var moveData = [
     {"from": "北京", "to": "上海", "value": 8000},
+    {"from": "北京", "to": "河北", "value": 8000000},
+    {"from": "北京", "to": "山东", "value": 79000},
+    {"from": "北京", "to": "四川", "value": 4000},
+    {"from": "北京", "to": "内蒙古", "value": 900000},
+    {"from": "北京", "to": "黑龙江", "value": 750000},
+    {"from": "北京", "to": "香港", "value": 130000},
+    {"from": "北京", "to": "天津", "value": 100000000},
     {"from": "广东", "to": "四川", "value": 150000},
     {"from": "新疆", "to": "北京", "value": 2500000},
     {"from": "浙江", "to": "山东", "value": 50000},

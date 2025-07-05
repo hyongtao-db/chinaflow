@@ -142,7 +142,7 @@
                         opacity: 0.8,
                         curveness: 0.2
                     },
-                    data: convertData(moveData)
+                    data: []
                 }
             ]
         };
@@ -153,14 +153,9 @@
         function filterData() {
             var from = document.getElementById("fromSelect").value;
             var to = document.getElementById("toSelect").value;
-
             var filteredData = moveData.filter(function(item) {
-                // 可以拓展到 app 过滤，这里演示先保留抖音/微信/支付宝字段
-                // 此处演示：目前 moveData 没有 app 字段，若有可加判断 item.app == app
-                return (from === item.from || from === "" )
-                    && (to === item.to || to === "" );
+                return item.from === from && item.to === to;
             });
-
             option.series[0].data = convertData(filteredData);
             chart.setOption(option);
         }
