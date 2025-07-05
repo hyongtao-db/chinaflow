@@ -74,9 +74,13 @@
         window.onload = function() {
             var fromSel = document.getElementById("fromSelect");
             var toSel = document.getElementById("toSelect");
+            // 添加"所有"选项
+            fromSel.innerHTML = '<option value="">所有</option>';
+            toSel.innerHTML = '<option value="">所有</option>';
+
             for (var city in geoCoordMap) {
-                fromSel.innerHTML += '<option value="'+city+'">'+city+'</option>';
-                toSel.innerHTML += '<option value="'+city+'">'+city+'</option>';
+                fromSel.innerHTML += '<option value="' + city + '">' + city + '</option>';
+                toSel.innerHTML += '<option value="' + city + '">' + city + '</option>';
             }
         };
 
@@ -164,16 +168,31 @@
         function filterData() {
             var from = document.getElementById("fromSelect").value;
             var to = document.getElementById("toSelect").value;
+            
+            // 根据选择条件筛选数据
             var filteredData = moveData.filter(function(item) {
-                return item.from === from && item.to === to;
+                // 处理起点条件
+                var fromMatch = true;
+                if (from !== "") {
+                    fromMatch = (item.from === from);
+                }
+                
+                // 处理终点条件
+                var toMatch = true;
+                if (to !== "") {
+                    toMatch = (item.to === to);
+                }
+                
+                return fromMatch && toMatch;
             }).map(function(item) {
                 // 格式化数值：大于1万显示为"x.x万"
                 var formattedValue = item.value >= 10000 ? 
                     (item.value/10000).toFixed(1) + '万' : 
-                    item.value;
+                    item.value.toString();
                 item.formattedValue = formattedValue;
                 return item;
             });
+            
             option.series[0].data = convertData(filteredData);
             chart.setOption(option);
         }
