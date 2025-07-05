@@ -8,6 +8,41 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
 </head>
 <body style="margin:0">
+    <!-- 选择项 -->
+    <div style="
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: #ffffff;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    ">
+
+        <label>起点：</label>
+        <select id="fromSelect" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;"></select>
+
+        <label>终点：</label>
+        <select id="toSelect" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;"></select>
+
+        <button onclick="filterData()" style="
+            padding: 6px 12px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        ">确定</button>
+    </div>
+
     <div id="main" style="width: 100vw; height: 100vh;"></div>
 
     <script type="text/javascript">
@@ -76,6 +111,16 @@
                 }
             }
             return res;
+        };
+
+        // 页面加载时填充起点终点城市
+        window.onload = function() {
+            var fromSel = document.getElementById("fromSelect");
+            var toSel = document.getElementById("toSelect");
+            for (var city in geoCoordMap) {
+                fromSel.innerHTML += '<option value="'+city+'">'+city+'</option>';
+                toSel.innerHTML += '<option value="'+city+'">'+city+'</option>';
+            }
         };
 
         // 配置项
@@ -148,6 +193,23 @@
         };
 
         chart.setOption(option);
+
+        // 筛选方法
+        function filterData() {
+            var from = document.getElementById("fromSelect").value;
+            var to = document.getElementById("toSelect").value;
+
+            var filteredData = moveData.filter(function(item) {
+                // 可以拓展到 app 过滤，这里演示先保留抖音/微信/支付宝字段
+                // 此处演示：目前 moveData 没有 app 字段，若有可加判断 item.app == app
+                return (from === item.from || from === "" )
+                    && (to === item.to || to === "" );
+            });
+
+            option.series[0].data = convertData(filteredData);
+            chart.setOption(option);
+        }
+
     </script>
 </body>
 </html>
