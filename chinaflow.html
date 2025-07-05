@@ -45,7 +45,18 @@
         ">确定</button>
     </div>
 
-    <div id="main" style="width: 100vw; height: 100vh;"></div>
+    <div id="main" style="width: calc(100vw - 300px); height: 100vh; float: left;"></div>
+    <div id="tableContainer" style="
+        width: 280px;
+        height: 100vh;
+        overflow-y: auto;
+        float: right;
+        padding: 16px;
+        box-sizing: border-box;
+        background: #fafafa;
+        border-left: 1px solid #ddd;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    "></div>
 
     <script type="text/javascript">
         var chart = echarts.init(document.getElementById('main'));
@@ -75,7 +86,7 @@
             var fromSel = document.getElementById("fromSelect");
             var toSel = document.getElementById("toSelect");
             // 添加"所有"选项
-            fromSel.innerHTML = '<option value="">所有</option>';
+            // fromSel.innerHTML = '<option value="">所有</option>';
             toSel.innerHTML = '<option value="">所有</option>';
 
             for (var city in geoCoordMap) {
@@ -195,6 +206,34 @@
             
             option.series[0].data = convertData(filteredData);
             chart.setOption(option);
+
+            // 渲染右侧表格
+            var tableHtml = '';
+            var from = document.getElementById("fromSelect").value;
+            if (from !== '') {
+                tableHtml += '<h3 style="margin-top:0;">' + from + '地区' + '人流量统计</h3>';
+                tableHtml += '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: center;">';
+                tableHtml += '<thead><tr><th>终点</th><th>人流量</th></tr></thead><tbody>';
+
+                // 先构造一个地名到人流量值的映射
+                var destMap = {};
+                for (var city in geoCoordMap) {
+                    destMap[city] = 0;
+                }
+                // 汇总符合筛选条件的人流量值
+                filteredData.forEach(function(item) {
+                    destMap[item.to] = item.value;
+                });
+                // 按地名顺序填表
+                for (var city in geoCoordMap) {
+                    tableHtml += '<tr><td>' + city + '</td><td>' + destMap[city] + '</td></tr>';
+                }
+
+                tableHtml += '</tbody></table>';
+            } else {
+                tableHtml = '<p style="color:#666;">请选择起点后查看人流量表格</p>';
+            }
+            document.getElementById("tableContainer").innerHTML = tableHtml;
         }
 
     </script>
