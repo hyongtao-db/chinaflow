@@ -3,18 +3,17 @@
 <head>
     <meta charset="utf-8">
     <title>中国人流迁徙图</title>
-    <!-- 引入 echarts.js -->
+    <!-- 引入 ECharts 和中国地图 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
 </head>
 <body style="margin:0">
-    <!-- 图表容器 -->
     <div id="main" style="width: 100vw; height: 100vh;"></div>
 
     <script type="text/javascript">
         var chart = echarts.init(document.getElementById('main'));
 
-        // 城市经纬度表
+        // 34个省市坐标
         var geoCoordMap = {
             "北京": [116.4074, 39.9042],
             "天津": [117.2000, 39.1333],
@@ -52,13 +51,16 @@
             "台湾": [121.5091, 25.0443]
         };
 
-        // 数据
+        // 迁徙数据
         var moveData = [
-            {"from": "北京", "to": "上海", "value": 1200},
-            {"from": "广东", "to": "四川", "value": 800}
+            {"from": "北京", "to": "上海", "value": 8000},
+            {"from": "广东", "to": "四川", "value": 150000},
+            {"from": "新疆", "to": "北京", "value": 2500000},
+            {"from": "浙江", "to": "山东", "value": 50000},
+            {"from": "河南", "to": "江苏", "value": 15000000}
         ];
 
-        // 转换成 ECharts 需要的格式
+        // 转换为 ECharts lines 数据格式
         var convertData = function (data) {
             var res = [];
             for (var i = 0; i < data.length; i++) {
@@ -76,6 +78,7 @@
             return res;
         };
 
+        // 配置项
         var option = {
             backgroundColor: '#FFFFFF',
             tooltip: {
@@ -90,12 +93,7 @@
             },
             geo: {
                 map: 'china',
-                roam: true, // 可以拖动缩放
-                label: {
-                    emphasis: {
-                        show: false
-                    }
-                },
+                roam: true,
                 itemStyle: {
                     normal: {
                         areaColor: '#C8E6E0',
@@ -106,36 +104,46 @@
                     }
                 }
             },
+            // 视觉映射（分段图例）
+            visualMap: {
+                type: 'piecewise',
+                min: 0,
+                max: 10000000,
+                pieces: [
+                    {min: 10000000, label: '> 1000万', color: '#800026'},
+                    {min: 1000000, max: 9999999, label: '100万-1000万', color: '#BD0026'},
+                    {min: 100000, max: 999999, label: '10万-100万', color: '#E31A1C'},
+                    {min: 10000, max: 99999, label: '1万-10万', color: '#FC4E2A'},
+                    {min: 0, max: 9999, label: '0-1万', color: '#FD8D3C'}
+                ],
+                orient: 'vertical',
+                right: 20,
+                bottom: 30,
+                textStyle: {
+                    color: '#000'
+                }
+            },
             series: [
-            {
-                name: '人流量',
-                type: 'lines',
-                coordinateSystem: 'geo',
-                zlevel: 2,
-                effect: {
-                show: true,
-                period: 4,
-                trailLength: 0.2,
-                symbol: 'arrow',
-                symbolSize: 10
-                },
-                lineStyle: {
-                color: function (params) {
-                    var v = params.data.value;
-                    if (v > 1000) {
-                    return '#d73027'; // 深红
-                    } else if (v > 500) {
-                    return '#fc8d59'; // 橙色
-                    } else {
-                    return '#fee090'; // 浅黄
-                    }
-                },
-                width: 2,
-                opacity: 0.8,
-                curveness: 0.2
-                },
-                data: convertData(moveData)
-            }
+                {
+                    name: '人流量',
+                    type: 'lines',
+                    coordinateSystem: 'geo',
+                    zlevel: 2,
+                    effect: {
+                        show: true,
+                        period: 4,
+                        trailLength: 0.2,
+                        symbol: 'arrow',
+                        symbolSize: 10
+                    },
+                    lineStyle: {
+                        color: '#d73027',
+                        width: 2,
+                        opacity: 0.8,
+                        curveness: 0.2
+                    },
+                    data: convertData(moveData)
+                }
             ]
         };
 
