@@ -6,7 +6,7 @@
     <!-- 引入 ECharts 和中国地图 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
-    <!-- 引入数据-->
+    <!-- 引入数据 -->
     <script src="data.js"></script>
 </head>
 <body style="margin:0">
@@ -59,6 +59,23 @@
     "></div>
 
     <script type="text/javascript">
+
+        var moveData = [];  // 定义全局 moveData 数组
+
+        // 页面加载完成后，请求后端数据
+        fetch("http://127.0.0.1:8080/getMoveData")
+            .then(response => response.json())
+            .then(data => {
+                console.log("后台返回数据", data);  // <---- 这里看看实际数据
+                moveData = data;
+                // 初始渲染一次地图（如果你希望加载后就展示所有数据）
+                // option.series[0].data = convertData(moveData);
+                // chart.setOption(option);
+            })
+            .catch(error => {
+                console.error("获取迁徙数据失败:", error);
+            });
+
         var chart = echarts.init(document.getElementById('main'));
 
         // 转换为 ECharts lines 数据格式
@@ -206,7 +223,7 @@
             
             option.series[0].data = convertData(filteredData);
             chart.setOption(option);
-
+            
             // 渲染右侧表格
             var tableHtml = '';
             var from = document.getElementById("fromSelect").value;
